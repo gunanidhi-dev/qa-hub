@@ -9,5 +9,5 @@ qa-hub-*.json
 qa-hub-*.csv
 shots/
 # Local sign-in hashes — never commit (create with scripts/create-users.js)
-data/users.local.json
-users.txt
+data1/users.local.json
+users1.txt
