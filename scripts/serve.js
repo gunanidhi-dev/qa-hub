@@ -24,7 +24,7 @@ const TYPES = {
 };
 
 createServer(async (req, res) => {
-  if (!enforceIpAllowlist(req, res)) return;
+  if (!enforceIpAllowlist(req, res, { allowLoopback: host === '127.0.0.1' || host === '::1' })) return;
   try {
     const url = new URL(req.url, 'http://localhost');
     let path = normalize(decodeURIComponent(url.pathname)).replace(/^([/\\])+/, '');

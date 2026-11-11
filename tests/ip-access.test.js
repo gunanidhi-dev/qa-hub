@@ -2,6 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { enforceIpAllowlist, isAllowedIp } from '../scripts/ip-access.js';
 
+test('local-only mode permits loopback connections', () => {
+  for (const ip of ['127.0.0.1', '::1', '::ffff:127.0.0.1']) {
+    assert.equal(enforceIpAllowlist({ socket: { remoteAddress: ip } }, {}, { allowLoopback: true }), true);
+  }
+});
+
 test('allows only the two specified IPs, including IPv4-mapped connections', () => {
   for (const ip of ['100.31.136.152', '120.56.46.9', '::ffff:100.31.136.152', '::FFFF:120.56.46.9']) {
     assert.equal(isAllowedIp(ip), true, ip);

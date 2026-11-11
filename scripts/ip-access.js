@@ -7,7 +7,9 @@ export function isAllowedIp(address) {
   return ALLOWED_IPS.has(normalized);
 }
 
-export function enforceIpAllowlist(req, res) {
+export function enforceIpAllowlist(req, res, { allowLoopback = false } = {}) {
+  const address = req.socket.remoteAddress?.toLowerCase().replace(/^::ffff:/, '');
+  if (allowLoopback && (address === '127.0.0.1' || address === '::1')) return true;
   if (isAllowedIp(req.socket.remoteAddress)) return true;
   res.writeHead(403, {
     'Content-Type': 'text/plain; charset=utf-8',
