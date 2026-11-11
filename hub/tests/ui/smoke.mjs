@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import assert from 'node:assert/strict';
 import { hashPassword, randomSalt } from '../../js/auth.js';
+import { APP_ROOT, appPath } from '../../scripts/paths.js';
 
 const PORT = 5199;
 const TEST_USER = 'gunanidhi';
@@ -34,7 +35,7 @@ const browserPath = BROWSERS.find((p) => existsSync(p));
 if (!browserPath) { console.log('SKIP: no Chrome/Edge found (set CHROME_PATH).'); process.exit(0); }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const server = spawn(process.execPath, ['scripts/serve.js', String(PORT)], { stdio: 'pipe' });
+const server = spawn(process.execPath, [appPath('scripts/serve.js'), String(PORT)], { cwd: APP_ROOT, stdio: 'pipe' });
 const profileDir = mkdtempSync(join(tmpdir(), 'qahub-smoke-'));
 const browser = spawn(browserPath, [
   '--headless=new', `--remote-debugging-port=${DEBUG_PORT}`, `--user-data-dir=${profileDir}`,
@@ -324,6 +325,41 @@ async function main() {
   await go(`#/cases/${id1}`);
   await waitFor(`document.querySelector('.steps-view')`);
   await shot('10-detail-dark');
+
+  step = 'assigned workspace and developer report';
+  await evaluate(`window.qaHub.store.updateCase(${JSON.stringify(id1)}, { assignedTo: 'mbr-sujitha', completionStatus: 'Pending' })`);
+  await go('#/dashboard');
+  await waitFor(`document.querySelector('.developer-table')`);
+  assert.ok(await evaluate(`document.querySelector('.developer-table').textContent.includes('Sujitha')`));
+  await evaluate(`window.qaHub.store.setActor('mbr-sujitha')`);
+  await go('#/cases');
+  await waitFor(`document.querySelector('h1')?.textContent === 'My assigned test cases'`);
+  assert.equal(await evaluate(`document.querySelectorAll('tbody tr').length`), 1);
+  assert.equal(await evaluate(`!!document.querySelector('.nav a[href="#/data"]')`), false);
+  await go(`#/cases/${id2}`);
+  await waitFor(`document.querySelector('main').textContent.includes('Test case not found')`);
+  await go('#/data');
+  await waitFor(`document.querySelector('main').textContent.includes('administrators only')`);
+  await go(`#/cases/${id1}`);
+  await waitFor(`document.querySelector('.steps-view')`);
+  await clickText('main button', 'Mark completed');
+  await waitFor(`document.querySelector('main').textContent.includes('Reopen case')`);
+  await go('#/dashboard');
+  await waitFor(`document.querySelector('h1')?.textContent === 'My testing workspace'`);
+  assert.equal(await evaluate(`!!document.querySelector('.developer-table')`), false);
+  assert.ok(await evaluate(`document.querySelector('.completion-ring').getAttribute('aria-label').includes('100%')`));
+  await shot('11-assigned-dashboard');
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+  assert.ok(await evaluate('document.documentElement.scrollWidth - window.innerWidth <= 1'), 'assigned dashboard fits mobile');
+  await evaluate(`window.qaHub.store.setActor('mbr-gunanidhi')`);
+  await go('#/cases');
+  await go('#/dashboard');
+  await waitFor(`document.querySelector('.developer-table')`);
+  const sujitha = await evaluate(`Array.from(document.querySelectorAll('.developer-table tbody tr')).find(r => r.textContent.includes('Sujitha')).textContent`);
+  assert.ok(sujitha.includes('100%'), 'admin sees developer completion');
+  assert.ok(await evaluate('document.documentElement.scrollWidth - window.innerWidth <= 1'), 'admin dashboard fits mobile');
+  await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+  await shot('12-developer-report');
 
   assert.deepEqual(errors, [], `browser errors:\n${errors.join('\n')}`);
   console.log('UI smoke test passed.');

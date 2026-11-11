@@ -320,3 +320,14 @@ a.list-item:hover { background: var(--surface-2); text-decoration: none; }
 .completion-done { color: var(--ok); border: 1px solid currentColor; }
 .completion-pending { color: var(--text-3); }
 @media (max-width: 600px) { .completion-summary { align-items: flex-start; flex-direction: column; } .completion-metrics { grid-template-columns: 1fr; } }
+
+.developer-report { display: grid; gap: 16px; }
+.developer-table-wrap { overflow-x: auto; }
+.developer-table { width: 100%; border-collapse: collapse; text-align: left; }
+.developer-table th, .developer-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.developer-table thead { color: var(--text-3); font-size: 12px; }
+.developer-table tbody th { font-weight: 600; }
+.developer-progress { display: flex; gap: 12px; align-items: center; font-variant-numeric: tabular-nums; }
+.developer-progress progress { width: 120px; height: 8px; accent-color: var(--ok); }
+
+.developer-report-card { margin-bottom: 16px; }

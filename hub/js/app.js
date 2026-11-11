@@ -2,6 +2,7 @@
 
 import { createIndexedDbPersistence, createMemoryPersistence } from './db.js';
 import { createStore } from './store.js';
+import { assignedStore, isAdmin } from './visibility.js';
 import { createRouter } from './router.js';
 import { h, icon, clear, prefs, fmtRelative } from './utils.js';
 import { openModal, confirmDialog, isModalOpen } from './components/modal.js';
@@ -170,9 +171,10 @@ function toggleTheme() {
 
 function renderChrome() {
   const path = router?.current?.path || '';
-  shell.nav.replaceChildren(...NAV.filter((n) => !n.show || n.show(store)).map((n) => {
+  const visibleStore = assignedStore(store);
+  shell.nav.replaceChildren(...NAV.filter((n) => (isAdmin(store) || n.section === 'Workspace' || ['#/dashboard', '#/cases'].includes(n.href)) && (!n.show || n.show(visibleStore))).map((n) => {
     if (n.section) return h('div', { class: 'nav-section' }, n.section);
-    const count = n.count ? n.count(store) : '';
+    const count = n.count ? n.count(visibleStore) : '';
     return h('a', { href: n.href, 'aria-current': n.match.test(path) ? 'page' : undefined, title: n.label },
       icon(n.icon), h('span', { class: 'nav-label' }, n.label), count !== '' ? h('span', { class: 'count' }, String(count)) : null);
   }));
@@ -180,7 +182,8 @@ function renderChrome() {
   document.title = `QA Hub · ${store.meta.project.name}`;
   shell.unexported.hidden = !store.hasUnexportedChanges();
   const me = store.actor();
-  shell.newBtn.hidden = !store.can('case.edit');
+  shell.newBtn.hidden = !isAdmin(store) || !store.can('case.edit');
+  shell.unexported.hidden = !isAdmin(store) || !store.hasUnexportedChanges();
   const dark = document.documentElement.dataset.theme === 'dark';
   shell.themeBtn.replaceChildren(icon(dark ? 'sun' : 'moon'));
   shell.themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
@@ -210,8 +213,12 @@ function renderPage(current, { keepScroll = false } = {}) {
   currentPage = page;
   clear(shell.content);
   renderChrome();
+  if (!isAdmin(store) && (![dashboard, cases, caseDetail, caseEditor].includes(page) || (page === caseEditor && (!current.params.id || current.query.from)))) {
+    shell.content.append(banner('warn', [h('strong', null, 'This page is available to administrators only.'), h('a', { href: '#/cases' }, 'View my assigned cases')]));
+    return;
+  }
   const ctx = {
-    store, router, params: current.params, query: current.query, root: shell.content, setCrumbs,
+    store: assignedStore(store), router, params: current.params, query: current.query, root: shell.content, setCrumbs,
     go: (path, query, opts) => router.go(path, query, opts),
     registerEditor({ isDirty, save }) { dirtyCheck = isDirty; saveHandler = save; },
     profilePicker,

@@ -62,7 +62,7 @@ export function render(ctx) {
     size: Number(ctx.query.size) || prefs.get('pageSize', 25),
   };
   const hidden = new Set(prefs.get('hiddenColumns', DEFAULT_HIDDEN));
-  const scope = JSON.stringify(state.f);
+  const scope = JSON.stringify([store.actor()?.id, state.f]);
   if (scope !== selectionScope) { selected = new Set(); selectionScope = scope; }
 
   const mod = state.f.module ? store.get('modules', state.f.module) : null;
@@ -76,11 +76,11 @@ export function render(ctx) {
     toast(`Exported ${plural(rows.length, 'case')} to CSV`);
   };
   root.append(pageHead({
-    title: mod ? `${mod.name}${feat ? ` / ${feat.name}` : ''}` : 'Test Case Library',
+    title: store.actor()?.role !== 'Admin' ? 'My assigned test cases' : mod ? `${mod.name}${feat ? ` / ${feat.name}` : ''}` : 'Test Case Library',
     subtitle: mod?.description || 'Search, filter and manage documented test cases.',
     actions: [
       h('button', { type: 'button', class: 'btn', onClick: exportCsv }, icon('data', 16), 'Export CSV'),
-      canEdit && h('a', { class: 'btn btn-primary', href: `#/cases/new${state.f.module ? `?module=${state.f.module}${state.f.feature ? `&feature=${state.f.feature}` : ''}` : ''}` }, icon('plus', 16), 'New case'),
+      store.can('case.create') && h('a', { class: 'btn btn-primary', href: `#/cases/new${state.f.module ? `?module=${state.f.module}${state.f.feature ? `&feature=${state.f.feature}` : ''}` : ''}` }, icon('plus', 16), 'New case'),
     ],
   }));
 
@@ -299,7 +299,7 @@ export function render(ctx) {
     return menu(null, [
       { label: 'Open', icon: 'file', onClick: () => router.go(`/cases/${c.id}`) },
       canEdit && { label: 'Edit', icon: 'edit', onClick: () => router.go(`/cases/${c.id}/edit`) },
-      canEdit && { label: 'Duplicate', icon: 'copy', onClick: () => router.go('/cases/new', { from: c.id }) },
+      store.can('case.create') && { label: 'Duplicate', icon: 'copy', onClick: () => router.go('/cases/new', { from: c.id }) },
       canEdit && 'sep',
       canEdit && {
         label: 'Move to trash', icon: 'trash', danger: true, onClick: async () => {
@@ -328,7 +328,7 @@ export function render(ctx) {
       const anyFilter = FILTER_KEYS.some((k) => state.f[k]);
       tableWrap.replaceChildren(emptyState(anyFilter
         ? { iconName: 'search', title: 'No cases match these filters', text: 'Try removing a filter or searching for something else.', action: h('button', { type: 'button', class: 'btn', onClick: () => router.go('/cases', {}) }, 'Clear filters') }
-        : { iconName: 'cases', title: 'No test cases yet', text: 'Document your first case — it takes about a minute.', action: canEdit && h('a', { class: 'btn btn-primary', href: '#/cases/new' }, icon('plus', 16), 'New case') }));
+        : { iconName: 'cases', title: store.can('case.create') ? 'No test cases yet' : 'No cases assigned yet', text: store.can('case.create') ? 'Document your first case — it takes about a minute.' : 'Your administrator can assign test cases to you. They will appear here.', action: store.can('case.create') && h('a', { class: 'btn btn-primary', href: '#/cases/new' }, icon('plus', 16), 'New case') }));
       pager.replaceChildren();
       return;
     }

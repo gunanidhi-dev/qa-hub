@@ -6,6 +6,8 @@ Data is stored in your browser's IndexedDB. The team shares data by exporting JS
 
 ## Run it
 
+The app now lives in `hub/`. The commands below assume your terminal is in that folder (`cd hub` from the repository root). The repository root also provides `npm start`, `npm test`, and `npm run test:ui` wrappers. Scripts resolve app-owned files relative to `hub`, regardless of the terminal's current directory; explicit input/output arguments remain relative to the terminal directory.
+
 ES modules need to be served over HTTP. Opening `index.html` with `file://` does not work.
 
 ```bash
@@ -16,7 +18,7 @@ The server has no dependencies, so `npm install` is not needed. It needs Node 20
 
 ### IP access restriction
 
-The bundled server permits only `100.31.136.152` and `120.56.46.9`. Every other address, including localhost, receives HTTP 403 before any files are read. IPv4-mapped IPv6 connections are supported. The allowlist is in `scripts/ip-access.js`.
+In network-facing mode, the bundled server permits only `100.31.136.152` and `120.56.46.9`. Other addresses receive HTTP 403 before any files are read. When bound only to `127.0.0.1` or `::1`, loopback access is permitted for local testing. IPv4-mapped IPv6 connections are supported. The allowlist is in `scripts/ip-access.js`.
 
 Use `npm start` to enforce this restriction; other static servers do not apply it. For direct network access, set `HOST` to the server's network interface (for example, `$env:HOST = '0.0.0.0'` in PowerShell) before starting. The default bind address remains `127.0.0.1`.
 
@@ -47,7 +49,7 @@ Sessions last until the tab closes, or 12 hours with "Keep me signed in". After 
 `data/library.json` is generated from the Markdown test cases (one file per module, `# Module` › `## Feature (N)` › `### N. Title — scenario`, `**Test data:**`, and a `| Step | Action | Expected result |` table):
 
 ```bash
-node scripts/import-markdown.js ../patientmanager-testing-analysis/testing-analysis/testcases
+node scripts/import-markdown.js ../../patientmanager-testing-analysis/testing-analysis/testcases
 ```
 
 The output is deterministic: fixed IDs (`case-<module>-0001`), keys (`LOGIN-001`, `PAT-001`, …) and timestamps, so re-running on unchanged Markdown gives an identical file. The script warns when a feature heading's declared count does not match the cases found. Imported cases start as **Ready for Review**.
@@ -209,3 +211,9 @@ All user-entered text is rendered with `textContent` through the `h()` helper in
 Cases have a separate **Pending / Completed** execution field. Existing cases default to Pending. Use **Mark completed** or **Reopen case** on the case detail page, the editor's Completion field, or Bulk edit in the library. Completion records execution, not a pass/fail result, and does not change review status.
 
 The dashboard shows completion percentage, pending/completed totals and lists, and completion by module. All figures include non-deleted cases, including deprecated cases. Click totals or View all to open the filtered library. Completion is preserved in local storage, JSON backups/imports and CSV exports; the activity log records changes. Team members still share updates through export/import.
+
+## Assigned workspaces and developer reports
+
+Non-admin accounts (including Maintainers and Viewers) see only cases assigned to them in their workspace: dashboard, library, search, case details, editor and CSV exports. Direct links to other cases show not found. Administrative pages, full JSON exports/imports and case creation are restricted to Admin in the UI. Existing edit permissions still apply, so Viewers cannot update completion. Admins see the full library and an execution report per member, including unassigned work, with clickable pending/completed counts and progress percentages.
+
+These are browser UI restrictions, not confidentiality controls on public static hosting. The original library JSON remains downloadable. Reports reflect local/imported data; other developers' updates require export/import before appearing in an Admin's browser.

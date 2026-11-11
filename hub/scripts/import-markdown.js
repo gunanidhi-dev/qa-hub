@@ -18,12 +18,18 @@ import { createHash } from 'node:crypto';
 import { join, basename, resolve } from 'node:path';
 import { SCHEMA_VERSION, emptyDocument, normalizeCase, blankCase } from '../js/schema.js';
 import { classifyCase, SUITES } from '../js/library-rules.js';
+import { appPath } from './paths.js';
 
 const args = process.argv.slice(2);
 const outIdx = args.indexOf('--out');
-const out = outIdx >= 0 ? args[outIdx + 1] : 'data/library.json';
-const srcDir = resolve(args.find((a, i) => !a.startsWith('--') && i !== outIdx + 1)
-  || '../patientmanager-testing-analysis/testing-analysis/testcases');
+if (outIdx >= 0 && (!args[outIdx + 1] || args[outIdx + 1].startsWith('--'))) {
+  console.error('--out requires an output file path.');
+  process.exit(1);
+}
+const out = outIdx >= 0 ? resolve(args[outIdx + 1]) : appPath('data/library.json');
+const sourceArg = args.find((a, i) => !a.startsWith('--') && (outIdx < 0 || i !== outIdx + 1));
+const srcDir = sourceArg ? resolve(sourceArg)
+  : appPath('../../patientmanager-testing-analysis/testing-analysis/testcases');
 
 if (!existsSync(srcDir)) {
   console.error(`Test case folder not found: ${srcDir}`);

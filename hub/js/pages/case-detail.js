@@ -73,7 +73,7 @@ export function render({ store, root, params, setCrumbs, router }) {
     canReview && !c.deletedAt && c.status === 'Ready for Review' && h('button', { type: 'button', class: 'btn btn-primary', onClick: () => review('approve') }, icon('check', 16), 'Approve'),
     canEdit && h('a', { class: 'btn btn-primary', href: `#/cases/${c.id}/edit` }, icon('edit', 16), 'Edit'),
     store.can('case.edit') && menu(null, [
-      { label: 'Duplicate', icon: 'copy', onClick: () => router.go('/cases/new', { from: c.id }) },
+      store.can('case.create') && { label: 'Duplicate', icon: 'copy', onClick: () => router.go('/cases/new', { from: c.id }) },
       { label: 'Copy link', icon: 'file', onClick: () => navigator.clipboard?.writeText(location.href).then(() => toast('Link copied')).catch(() => toast('Copy failed — use the address bar', { type: 'error' })) },
       !c.deletedAt && 'sep',
       !c.deletedAt && { label: 'Move to trash', icon: 'trash', danger: true, onClick: del },

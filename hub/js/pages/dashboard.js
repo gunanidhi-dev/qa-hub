@@ -3,6 +3,7 @@ import { PRIORITIES, CASE_STATUSES, TEST_LEVELS } from '../schema.js';
 import { ACTIONS } from '../activity.js';
 import { pageHead, card, barList, emptyState, person, statusChip, priorityChip, banner } from '../components/ui.js';
 import { buildHash } from '../router.js';
+import { developerProgress, isAdmin } from '../visibility.js';
 
 const STATUS_COLORS = { Draft: 'var(--chart-5)', 'Ready for Review': 'var(--chart-3)', Approved: 'var(--ok)', Deprecated: 'var(--border-strong)' };
 const PRIORITY_COLORS = { Critical: 'var(--p-critical)', High: 'var(--p-high)', Medium: 'var(--p-medium)', Low: 'var(--p-low)' };
@@ -87,8 +88,8 @@ export function render({ store, root, setCrumbs }) {
   const trashCount = all.length - active.length;
 
   root.append(pageHead({
-    title: store.meta.project.name,
-    subtitle: `Documented test cases across ${store.data.modules.filter((m) => !m.archived).length} modules. Figures come only from data in this browser.`,
+    title: isAdmin(store) ? store.meta.project.name : 'My testing workspace',
+    subtitle: !isAdmin(store) ? 'Only your assigned test cases. Track pending work and completed execution here.' : `Documented test cases across ${store.data.modules.filter((m) => !m.archived).length} modules. Figures come only from data in this browser.`,
   }));
 
   if (active.some((c) => c.demo)) {
@@ -146,6 +147,23 @@ export function render({ store, root, setCrumbs }) {
       h('span', { class: 'grow' }, h('span', { class: 'title' }, c.title), h('span', { class: 'muted small' }, store.get('modules', c.moduleId)?.name || '')),
       priorityChip(c.priority))))
     : h('div', { class: 'card-body' }, h('p', { class: 'muted small' }, emptyText)));
+
+  if (isAdmin(store)) {
+    const rows = developerProgress(store);
+    root.append(card({ title: 'Developer execution report', cls: 'developer-report-card',
+      actions: h('a', { class: 'small', href: '#/assign' }, 'Manage assignments'),
+      body: h('div', { class: 'developer-report' },
+        h('p', { class: 'muted small' }, 'All non-deleted assigned cases. Completed means executed, not passed. Reports reflect data loaded in this browser.'),
+        h('div', { class: 'developer-table-wrap' }, h('table', { class: 'developer-table' },
+          h('thead', null, h('tr', null, ['Developer', 'Assigned', 'Pending', 'Completed', 'Progress'].map((label) => h('th', { scope: 'col' }, label)))),
+          h('tbody', null, rows.map((row) => h('tr', null,
+            h('th', { scope: 'row' }, row.name, !row.active && h('span', { class: 'muted small' }, ' (inactive)')),
+            h('td', null, h('a', { href: libLink({ assignee: row.id || 'none' }) }, String(row.total))),
+            h('td', null, h('a', { href: libLink({ assignee: row.id || 'none', completion: 'Pending' }) }, String(row.pending))),
+            h('td', null, h('a', { href: libLink({ assignee: row.id || 'none', completion: 'Completed' }) }, String(row.completed))),
+            h('td', null, h('div', { class: 'developer-progress' }, h('progress', { max: 100, value: row.percent, 'aria-label': `${row.name}: ${row.completed} of ${row.total} completed` }), h('span', null, `${row.percent}%`))))))))),
+    }));
+  }
 
   const completed = active.filter((c) => c.completionStatus === 'Completed');
   const pending = active.filter((c) => c.completionStatus !== 'Completed');

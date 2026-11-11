@@ -11,9 +11,10 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { hashPassword, randomSalt, PBKDF2_ITERATIONS } from '../js/auth.js';
+import { appPath } from './paths.js';
 
-const OUT = 'data/users.local.json';
-const LIBRARY = 'data/library.json';
+const OUT = appPath('data/users.local.json');
+const LIBRARY = appPath('data/library.json');
 
 const ADD = process.argv.includes('--add');
 const src = process.argv.slice(2).find((a) => a !== '--add');
