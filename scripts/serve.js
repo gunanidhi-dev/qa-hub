@@ -5,6 +5,7 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { enforceIpAllowlist } from './ip-access.js';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const port = Number(process.argv[2] || process.env.PORT || 5173);
@@ -23,6 +24,7 @@ const TYPES = {
 };
 
 createServer(async (req, res) => {
+  if (!enforceIpAllowlist(req, res)) return;
   try {
     const url = new URL(req.url, 'http://localhost');
     let path = normalize(decodeURIComponent(url.pathname)).replace(/^([/\\])+/, '');

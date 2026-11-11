@@ -10,11 +10,17 @@ ES modules need to be served over HTTP. Opening `index.html` with `file://` does
 
 ```bash
 npm start            # node scripts/serve.js  →  http://127.0.0.1:5173/
-# or, with any static server:
-python -m http.server 5173
 ```
 
 The server has no dependencies, so `npm install` is not needed. It needs Node 20 or later (Node 22 or later for the UI smoke test).
+
+### IP access restriction
+
+The bundled server permits only `100.31.136.152` and `120.56.46.9`. Every other address, including localhost, receives HTTP 403 before any files are read. IPv4-mapped IPv6 connections are supported. The allowlist is in `scripts/ip-access.js`.
+
+Use `npm start` to enforce this restriction; other static servers do not apply it. For direct network access, set `HOST` to the server's network interface (for example, `$env:HOST = '0.0.0.0'` in PowerShell) before starting. The default bind address remains `127.0.0.1`.
+
+The server checks the TCP peer address and ignores forwarding headers. If hosted behind a reverse proxy or CDN, enforce these two allowed client IPs at that trusted entry point and prevent direct origin access; the bundled server will otherwise see and reject the proxy's address. Previously downloaded browser data is not removed by this restriction. The existing local UI smoke test is blocked by the allowlist as well.
 
 On first launch the app seeds this browser from `data/library.json` (the Patient Manager library: 3,815 cases in 19 modules) and shows the sign-in screen.
 
