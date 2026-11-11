@@ -1,7 +1,7 @@
 // Pure validation helpers (no DOM). Return plain objects so the UI can show inline errors.
 
 import {
-  SCHEMA_VERSION, PRIORITIES, CASE_STATUSES, TEST_LEVELS, AUTOMATION_STATUSES, ROLES, LIMITS, COLLECTIONS, idOf,
+  SCHEMA_VERSION, PRIORITIES, COMPLETION_STATUSES, CASE_STATUSES, TEST_LEVELS, AUTOMATION_STATUSES, ROLES, LIMITS, COLLECTIONS, idOf,
 } from './schema.js';
 
 const isIso = (v) => typeof v === 'string' && !Number.isNaN(Date.parse(v));
@@ -38,6 +38,7 @@ export function validateCase(tc, ctx) {
 
   if (!str(tc.objective)) errors.objective = 'Describe the objective or expected business behaviour.';
   if (!PRIORITIES.includes(tc.priority)) errors.priority = 'Choose a priority.';
+  if (tc.completionStatus !== undefined && !COMPLETION_STATUSES.includes(tc.completionStatus)) errors.completionStatus = 'Choose Pending or Completed.';
   if (!CASE_STATUSES.includes(tc.status)) errors.status = 'Choose a status.';
   if (tc.testLevel && !TEST_LEVELS.includes(tc.testLevel)) errors.testLevel = 'Unknown test level.';
   if (tc.automationStatus && !AUTOMATION_STATUSES.includes(tc.automationStatus)) errors.automationStatus = 'Unknown automation status.';
@@ -201,6 +202,7 @@ export function validateDocument(doc, known = {}) {
       keys.set(tc.caseKey, tc.id);
     }
     if (tc.priority && !PRIORITIES.includes(tc.priority)) err(`Case ${label} has unknown priority "${tc.priority}".`);
+    if (tc.completionStatus !== undefined && !COMPLETION_STATUSES.includes(tc.completionStatus)) err(`Case ${label} has unknown completion status.`);
     if (tc.status && !CASE_STATUSES.includes(tc.status)) err(`Case ${label} has unknown status "${tc.status}".`);
     if (tc.testLevel && !TEST_LEVELS.includes(tc.testLevel)) err(`Case ${label} has unknown test level "${tc.testLevel}".`);
     if (tc.automationStatus && !AUTOMATION_STATUSES.includes(tc.automationStatus)) err(`Case ${label} has unknown automation status.`);

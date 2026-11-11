@@ -1,5 +1,5 @@
 import { h, icon, fmtRelative, fmtDate, debounce, prefs, downloadFile, plural, slug } from '../utils.js';
-import { PRIORITIES, CASE_STATUSES, TEST_LEVELS, AUTOMATION_STATUSES } from '../schema.js';
+import { PRIORITIES, COMPLETION_STATUSES, CASE_STATUSES, TEST_LEVELS, AUTOMATION_STATUSES } from '../schema.js';
 import { casesToCsv } from '../import-export.js';
 import {
   pageHead, priorityChip, statusChip, automationChip, suiteChip, person, emptyState, select, menu, lookups,
@@ -11,6 +11,7 @@ const COLUMNS = [
   { key: 'caseKey', label: 'Key', sort: (c) => c.caseKey, always: true },
   { key: 'title', label: 'Title', sort: (c) => c.title.toLowerCase(), always: true },
   { key: 'priority', label: 'Priority', sort: (c) => PRIORITIES.indexOf(c.priority) },
+  { key: 'completionStatus', label: 'Completion', sort: (c) => c.completionStatus || 'Pending' },
   { key: 'status', label: 'Status', sort: (c) => CASE_STATUSES.indexOf(c.status) },
   { key: 'testLevel', label: 'Level', sort: (c) => c.testLevel || '' },
   { key: 'suites', label: 'Suites' },
@@ -19,7 +20,7 @@ const COLUMNS = [
   { key: 'updatedAt', label: 'Updated', sort: (c) => c.updatedAt },
 ];
 const DEFAULT_HIDDEN = ['testLevel'];
-const FILTER_KEYS = ['q', 'module', 'feature', 'status', 'priority', 'level', 'suite', 'automation', 'assignee', 'account', 'tag'];
+const FILTER_KEYS = ['q', 'module', 'feature', 'completion', 'status', 'priority', 'level', 'suite', 'automation', 'assignee', 'account', 'tag'];
 
 let selected = new Set();
 let selectionScope = '';
@@ -31,6 +32,7 @@ export function filterCases(store, f) {
   return store.activeCases().filter((c) => {
     if (f.module && c.moduleId !== f.module) return false;
     if (f.feature && c.featureId !== f.feature) return false;
+    if (f.completion && (c.completionStatus || 'Pending') !== f.completion) return false;
     if (f.status && c.status !== f.status) return false;
     if (f.priority && c.priority !== f.priority) return false;
     if (f.level && c.testLevel !== f.level) return false;
@@ -100,6 +102,7 @@ export function render(ctx) {
     h('div', { class: 'search' }, icon('search', 16), search),
     sel('module', 'All modules', mods.map((m) => ({ value: m.id, label: m.name }))),
     featureOpts.length ? sel('feature', 'All features', featureOpts) : null,
+    sel('completion', 'Any completion', COMPLETION_STATUSES),
     sel('status', 'Any status', CASE_STATUSES),
     sel('priority', 'Any priority', PRIORITIES),
     sel('suite', 'Any suite', store.data.testSuites.map((s) => ({ value: s.id, label: s.name }))),
@@ -196,6 +199,7 @@ export function render(ctx) {
 
   function renderChips() {
     const labels = {
+      completion: (v) => v,
       q: (v) => `“${v}”`, module: (v) => look.moduleName(v), feature: (v) => look.featureName(v), status: (v) => v, priority: (v) => v,
       level: (v) => v, suite: (v) => look.suiteName(v), automation: (v) => v, assignee: (v) => (v === 'none' ? 'Unassigned' : look.memberName(v)),
       account: (v) => look.accountName(v), tag: (v) => `#${v}`,
@@ -242,6 +246,7 @@ export function render(ctx) {
       description: `Changes apply to exactly ${plural(ids.length, 'selected case')}. Each change is recorded in that case's history.`,
       wide: true,
       fields: [
+        { name: 'completionStatus', label: 'Completion', type: 'select', options: [keep, ...COMPLETION_STATUSES.map((s) => ({ value: s, label: s }))] },
         { name: 'status', label: 'Status', type: 'select', options: [keep, ...statusOpts.map((s) => ({ value: s, label: s }))] },
         { name: 'priority', label: 'Priority', type: 'select', options: [keep, ...PRIORITIES.map((s) => ({ value: s, label: s }))] },
         { name: 'testLevel', label: 'Test level', type: 'select', options: [keep, ...TEST_LEVELS.map((s) => ({ value: s, label: s }))] },
@@ -256,7 +261,7 @@ export function render(ctx) {
       onSubmit: async (v) => {
         const tags = (s) => s.split(',').map((t) => t.trim()).filter(Boolean);
         const patch = {};
-        for (const k of ['status', 'priority', 'testLevel', 'automationStatus']) if (v[k]) patch[k] = v[k];
+        for (const k of ['status', 'completionStatus', 'priority', 'testLevel', 'automationStatus']) if (v[k]) patch[k] = v[k];
         if (v.assignedTo) patch.assignedTo = v.assignedTo === '__none' ? '' : v.assignedTo;
         if (v.addSuite) patch.addSuites = [v.addSuite];
         if (v.removeSuite) patch.removeSuites = [v.removeSuite];
@@ -354,6 +359,7 @@ export function render(ctx) {
           c.demo ? h('span', { class: 'chip chip-demo plain', style: { marginLeft: '6px' } }, 'Demo') : null,
           h('div', { class: 'sub' }, [look.moduleName(c.moduleId), look.featureName(c.featureId)].filter(Boolean).join(' / ')));
         case 'priority': return h('td', { 'data-label': 'Priority' }, priorityChip(c.priority));
+        case 'completionStatus': return h('td', { 'data-label': 'Completion' }, h('span', { class: `chip ${c.completionStatus === 'Completed' ? 'completion-done' : 'completion-pending'}` }, c.completionStatus || 'Pending'));
         case 'status': return h('td', { 'data-label': 'Status' }, statusChip(c.status));
         case 'testLevel': return h('td', { 'data-label': 'Level' }, c.testLevel || '—');
         case 'suites': return h('td', { 'data-label': 'Suites' }, c.suites.length ? h('div', { class: 'chips' }, c.suites.map((s) => suiteChip(look.suiteName(s)))) : h('span', { class: 'muted' }, '—'));

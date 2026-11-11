@@ -62,6 +62,12 @@ export function render({ store, root, params, setCrumbs, router }) {
 
   const actions = h('div', { class: 'page-actions' },
     c.deletedAt && store.can('case.edit') && h('button', { type: 'button', class: 'btn btn-primary', onClick: () => store.restoreCase(c.id).then(() => toast(`${c.caseKey} restored`)).catch(toastError) }, icon('restore', 16), 'Restore'),
+    canEdit && !c.deletedAt && h('button', { type: 'button', class: 'btn btn-primary', onClick: async () => {
+      try {
+        await store.updateCase(c.id, { completionStatus: c.completionStatus === 'Completed' ? 'Pending' : 'Completed' }, { expectedVersion: c.version });
+        toast(c.completionStatus === 'Completed' ? 'Case reopened' : 'Case marked completed');
+      } catch (e) { toastError(e); }
+    } }, icon('check', 16), c.completionStatus === 'Completed' ? 'Reopen case' : 'Mark completed'),
     canEdit && c.status === 'Draft' && h('button', { type: 'button', class: 'btn', onClick: () => review('submit') }, icon('check', 16), 'Submit for review'),
     canReview && !c.deletedAt && c.status === 'Ready for Review' && h('button', { type: 'button', class: 'btn', onClick: () => review('reject') }, 'Send back'),
     canReview && !c.deletedAt && c.status === 'Ready for Review' && h('button', { type: 'button', class: 'btn btn-primary', onClick: () => review('approve') }, icon('check', 16), 'Approve'),
@@ -112,6 +118,7 @@ export function render({ store, root, params, setCrumbs, router }) {
       ['Module', mod ? h('a', { href: `#/cases?module=${mod.id}` }, mod.name) : 'Unknown'],
       ['Feature', feat ? feat.name : dash.cloneNode(true)],
       ['Priority', priorityChip(c.priority)],
+      ['Completion', plainChip(c.completionStatus || 'Pending')],
       ['Status', statusChip(c.status)],
       ['Test level', c.testLevel || dash.cloneNode(true)],
       ['Suites', c.suites.length ? h('div', { class: 'chips' }, c.suites.map((s) => suiteChip(look.suiteName(s)))) : dash.cloneNode(true)],

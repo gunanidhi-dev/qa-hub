@@ -3,6 +3,7 @@
 export const SCHEMA_VERSION = 1;
 
 export const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
+export const COMPLETION_STATUSES = ['Pending', 'Completed'];
 export const CASE_STATUSES = ['Draft', 'Ready for Review', 'Approved', 'Deprecated'];
 export const TEST_LEVELS = ['Unit', 'API', 'Integration', 'E2E', 'UI', 'Database', 'Security', 'Performance', 'Other'];
 export const AUTOMATION_STATUSES = ['Not Planned', 'Planned', 'In Progress', 'Automated', 'Not Applicable'];
@@ -56,7 +57,7 @@ export const CASE_CONTENT_FIELDS = [
   'title', 'moduleId', 'featureId', 'objective', 'description', 'preconditions', 'steps',
   'expectedResult', 'priority', 'status', 'testLevel', 'suites', 'automationStatus',
   'automationPath', 'tags', 'accountIds', 'assignedTo', 'requirementRef', 'bugRefs',
-  'risk', 'testDataNotes',
+  'risk', 'testDataNotes', 'completionStatus',
 ];
 
 export const FIELD_LABELS = {
@@ -71,6 +72,7 @@ export const FIELD_LABELS = {
   expectedResult: 'Expected result',
   priority: 'Priority',
   status: 'Status',
+  completionStatus: 'Completion',
   testLevel: 'Test level',
   suites: 'Suites',
   automationStatus: 'Automation',
@@ -111,6 +113,7 @@ export function blankCase() {
     expectedResult: '',
     priority: 'Medium',
     status: 'Draft',
+    completionStatus: 'Pending',
     testLevel: 'E2E',
     suites: [],
     automationStatus: 'Not Planned',

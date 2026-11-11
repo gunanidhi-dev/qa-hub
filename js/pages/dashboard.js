@@ -147,6 +147,32 @@ export function render({ store, root, setCrumbs }) {
       priorityChip(c.priority))))
     : h('div', { class: 'card-body' }, h('p', { class: 'muted small' }, emptyText)));
 
+  const completed = active.filter((c) => c.completionStatus === 'Completed');
+  const pending = active.filter((c) => c.completionStatus !== 'Completed');
+  const percent = active.length ? Math.round(completed.length / active.length * 100) : 0;
+  root.append(h('section', { class: 'completion-overview' },
+    h('div', { class: 'completion-summary' },
+      h('div', null, h('span', { class: 'completion-eyebrow' }, 'EXECUTION PROGRESS'),
+        h('h2', null, 'Every test accounted for.'),
+        h('p', { class: 'muted small' }, 'Track execution separately from review. Completed does not mean passed. Includes all non-deleted cases.')),
+      h('div', { class: 'completion-ring', role: 'img', 'aria-label': `${percent}% completed: ${completed.length} completed, ${pending.length} pending`, style: { background: `conic-gradient(var(--ok) ${percent}%, var(--border) 0)` } },
+        h('div', null, h('strong', null, `${percent}%`), h('span', null, 'completed')))),
+    h('div', { class: 'completion-metrics' },
+      stat('Pending execution', pending.length, libLink({ completion: 'Pending' }), 'Ready for your next testing session'),
+      stat('Completed', completed.length, libLink({ completion: 'Completed' }), `${completed.length} of ${active.length} cases executed`)),
+    h('div', { class: 'grid grid-2' },
+      card({ title: 'Pending execution', flush: true, body: caseList(pending, 'All cases completed. Nothing pending.'), actions: h('a', { class: 'small', href: libLink({ completion: 'Pending' }) }, `View all (${pending.length})`) }),
+      card({ title: 'Completed cases', flush: true, body: caseList([...completed].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), 'Mark your first case completed to see it here.'), actions: h('a', { class: 'small', href: libLink({ completion: 'Completed' }) }, `View all (${completed.length})`) })),
+    card({ title: 'Completion by module', body: h('div', { class: 'bars' }, mods.map((m) => {
+      const cases = active.filter((c) => c.moduleId === m.id);
+      const done = cases.filter((c) => c.completionStatus === 'Completed').length;
+      const pct = cases.length ? Math.round(done / cases.length * 100) : 0;
+      return h('a', { class: 'bar-row', href: libLink({ module: m.id, completion: 'Pending' }) },
+        h('span', { class: 'bar-label', title: m.name }, m.name),
+        h('span', { class: 'bar-track', role: 'img', 'aria-label': `${m.name}: ${done} of ${cases.length} completed` }, h('span', { class: 'bar-fill', style: { width: `${pct}%`, background: 'var(--ok)' } })),
+        h('span', { class: 'bar-value' }, `${done} / ${cases.length}`));
+    })) })));
+
   root.append(
     h('div', { class: 'grid grid-2', style: { marginBottom: '16px' } },
       card({ title: 'Module coverage', actions: h('span', { class: 'muted small' }, 'documented vs. target'), body: h('div', { class: 'stack', style: { gap: '12px' } }, coverage, h('p', { class: 'muted small' }, 'Counts documented, non-deprecated cases against the target your team entered per module. This is not code coverage.')) }),

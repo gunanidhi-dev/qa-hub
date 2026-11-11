@@ -1,5 +1,5 @@
 import { h, icon, clone, isEqual, debounce, fmtRelative } from '../utils.js';
-import { PRIORITIES, CASE_STATUSES, TEST_LEVELS, AUTOMATION_STATUSES, RISKS, CASE_CONTENT_FIELDS, blankCase, normalizeCase, LIMITS } from '../schema.js';
+import { PRIORITIES, COMPLETION_STATUSES, CASE_STATUSES, TEST_LEVELS, AUTOMATION_STATUSES, RISKS, CASE_CONTENT_FIELDS, blankCase, normalizeCase, LIMITS } from '../schema.js';
 import { card, field, fieldError, select, showErrors, banner, emptyState } from '../components/ui.js';
 import { toast, toastError } from '../components/toast.js';
 
@@ -34,7 +34,7 @@ export function render(ctx) {
   if (existing) initial = editable(normalizeCase(existing));
   else if (source) {
     initial = editable(normalizeCase(source));
-    Object.assign(initial, { caseKey: '', title: `Copy of ${source.title}`.slice(0, LIMITS.titleMax), status: 'Draft' });
+    Object.assign(initial, { caseKey: '', title: `Copy of ${source.title}`.slice(0, LIMITS.titleMax), status: 'Draft', completionStatus: 'Pending' });
   } else {
     initial = editable(blankCase());
     const mods = store.data.modules.filter((m) => !m.archived);
@@ -171,6 +171,7 @@ export function render(ctx) {
       field({ label: 'Feature / operation', input: featureSel, name: 'featureId' }),
       h('div', { class: 'field' }, h('label', { for: 'f-caseKey' }, 'Case key'), Object.assign(keyIn, { id: 'f-caseKey' }), keyHint, fieldError('caseKey')),
       field({ label: 'Priority', input: pick('priority', PRIORITIES), name: 'priority', required: true }),
+      field({ label: 'Completion', input: pick('completionStatus', COMPLETION_STATUSES), name: 'completionStatus', hint: 'Mark Completed after executing this case. Completion does not mean the test passed.' }),
       field({ label: 'Status', input: pick('status', statusOpts), name: 'status', required: true, hint: canApprove ? '' : 'Approval is done by a Maintainer/Admin from the case page.' }),
       field({ label: 'Test level', input: pick('testLevel', TEST_LEVELS), name: 'testLevel' }),
       field({ label: 'Objective / expected business behaviour', input: area('objective', 2, { placeholder: 'What must be true for the business when this passes?' }), name: 'objective', required: true, full: true }),

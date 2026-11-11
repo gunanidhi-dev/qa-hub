@@ -267,3 +267,29 @@ test('3,000 cases: filtering stays fast', async () => {
   assert.ok(filterMs < 50, `filter took ${filterMs}ms`);
   assert.ok(created < 20000);
 });
+
+
+test('completion persists, records history, supports bulk changes and export/import', async () => {
+  const { store, persistence } = await freshStore();
+  const a = await store.createCase(baseCase());
+  const b = await store.createCase(baseCase({ title: 'Another executable case' }));
+  assert.equal(a.completionStatus, 'Pending');
+  const done = await store.updateCase(a.id, { completionStatus: 'Completed' }, { expectedVersion: a.version });
+  assert.equal(done.status, 'Draft');
+  assert.equal(done.completionStatus, 'Completed');
+  assert.ok(store.data.activity.some((e) => e.entityId === a.id && e.changedFields?.some((f) => f.field === 'completionStatus' && f.after === 'Completed')));
+  const reloaded = createStore(persistence);
+  await reloaded.init();
+  assert.equal(reloaded.get('testCases', a.id).completionStatus, 'Completed');
+  await assert.rejects(store.updateCase(a.id, { completionStatus: 'Invalid' }), ValidationError);
+  await assert.rejects(store.bulkUpdateCases([a.id, b.id], { completionStatus: 'Invalid' }), ValidationError);
+  assert.equal(store.get('testCases', b.id).completionStatus, 'Pending');
+  await store.bulkUpdateCases([a.id, b.id], { completionStatus: 'Completed' });
+  assert.equal(store.get('testCases', b.id).completionStatus, 'Completed');
+  const doc = store.exportDocument();
+  const { store: imported } = await freshStore();
+  await imported.applyImport(planImport(imported.data, doc), { mode: 'replace', incoming: doc, sourceName: 'completion.json' });
+  assert.equal(imported.get('testCases', b.id).completionStatus, 'Completed');
+  await store.updateCase(a.id, { completionStatus: 'Pending' });
+  assert.equal(store.get('testCases', a.id).completionStatus, 'Pending');
+});

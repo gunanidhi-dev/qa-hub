@@ -203,3 +203,9 @@ tests/ui/smoke.mjs         headless browser end-to-end smoke test
 ```
 
 All user-entered text is rendered with `textContent` through the `h()` helper in [js/utils.js](js/utils.js). No user content is ever passed to `innerHTML`. CSV export neutralises spreadsheet formula injection. Core features make no network calls.
+
+## Completion tracking
+
+Cases have a separate **Pending / Completed** execution field. Existing cases default to Pending. Use **Mark completed** or **Reopen case** on the case detail page, the editor's Completion field, or Bulk edit in the library. Completion records execution, not a pass/fail result, and does not change review status.
+
+The dashboard shows completion percentage, pending/completed totals and lists, and completion by module. All figures include non-deleted cases, including deprecated cases. Click totals or View all to open the filtered library. Completion is preserved in local storage, JSON backups/imports and CSV exports; the activity log records changes. Team members still share updates through export/import.

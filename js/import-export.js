@@ -37,7 +37,7 @@ export function buildExport(collections, meta, { moduleId = null } = {}) {
 
 export const CSV_COLUMNS = [
   ['caseKey', 'Case key'], ['title', 'Title'], ['module', 'Module'], ['feature', 'Feature'], ['priority', 'Priority'],
-  ['status', 'Status'], ['testLevel', 'Test level'], ['suites', 'Suites'], ['automationStatus', 'Automation'],
+  ['completionStatus', 'Completion'], ['status', 'Status'], ['testLevel', 'Test level'], ['suites', 'Suites'], ['automationStatus', 'Automation'],
   ['automationPath', 'Automation path'], ['assignee', 'Assignee'], ['tags', 'Tags'], ['accounts', 'Accounts'],
   ['objective', 'Objective'], ['preconditions', 'Preconditions'], ['steps', 'Steps'], ['expectedResult', 'Expected result'],
   ['requirementRef', 'Requirement ref'], ['bugRefs', 'Bug refs'], ['risk', 'Risk'], ['version', 'Version'],

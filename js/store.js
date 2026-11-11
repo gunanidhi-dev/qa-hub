@@ -223,7 +223,7 @@ export function createStore(persistence) {
     for (const f of ['tags', 'bugRefs']) {
       if (Array.isArray(out[f])) out[f] = [...new Set(out[f].map((t) => String(t).trim()).filter(Boolean))];
     }
-    if (out.featureId === undefined || out.featureId === null) out.featureId = '';
+    if (out.featureId === null) out.featureId = '';
     return out;
   }
 
@@ -386,7 +386,7 @@ export function createStore(persistence) {
       const cur = get('testCases', id);
       if (!cur || cur.deletedAt) continue;
       const next = { ...cur };
-      for (const f of ['status', 'priority', 'testLevel', 'automationStatus', 'assignedTo']) if (patch[f] !== undefined) next[f] = patch[f];
+      for (const f of ['status', 'completionStatus', 'priority', 'testLevel', 'automationStatus', 'assignedTo']) if (patch[f] !== undefined) next[f] = patch[f];
       if (patch.addSuites || patch.removeSuites) {
         const s = new Set(next.suites);
         (patch.addSuites || []).forEach((x) => s.add(x));
@@ -403,7 +403,7 @@ export function createStore(persistence) {
       const changes = diffFields(cur, next);
       if (!changes.length) continue;
       const errors = validateCase(next, caseCtx());
-      if (errors.assignedTo || errors.suites || errors.status || errors.priority) throw new ValidationError(errors, `Bulk change invalid for ${cur.caseKey}.`);
+      if (errors.completionStatus || errors.assignedTo || errors.suites || errors.status || errors.priority) throw new ValidationError(errors, `Bulk change invalid for ${cur.caseKey}.`);
       records.push({ ...next, version: cur.version + 1, updatedAt: now, updatedBy: me.id });
       events.push(makeEvent({
         entityType: 'testCase', entityId: id, entityLabel: cur.caseKey, moduleId: cur.moduleId, action: 'bulk_update', actorId: me.id, changedFields: changes,
