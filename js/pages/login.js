@@ -22,7 +22,7 @@ function stats(store) {
  * @param {{store, submit:(v)=>Promise<{ok:boolean, reason?:string}>, lockoutRemaining:()=>number,
  *          staleData?:boolean, loadLibrary?:()=>Promise<void>}} opts
  */
-export function renderLogin(root, { store, submit, lockoutRemaining, staleData = false, loadLibrary }) {
+export function renderLogin(root, { store, submit, lockoutRemaining, staleData = false, loadLibrary, configurationError = '' }) {
   clear(root);
 
   const userIn = h('input', { id: 'login-user', name: 'username', type: 'text', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false', required: true, placeholder: 'username' });
@@ -61,6 +61,7 @@ export function renderLogin(root, { store, submit, lockoutRemaining, staleData =
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (configurationError) { showError(configurationError); return; }
     if (!userIn.value.trim() || !passIn.value) { showError('Enter your username and password.'); (userIn.value.trim() ? passIn : userIn).focus(); return; }
     const wait = lockoutRemaining();
     if (wait) { showError(`Too many attempts. Try again in ${wait}s.`); return; }
@@ -85,6 +86,14 @@ export function renderLogin(root, { store, submit, lockoutRemaining, staleData =
       submitBtn.firstChild.textContent = 'Sign in';
     }
   });
+
+  if (configurationError) {
+    userIn.disabled = true;
+    passIn.disabled = true;
+    remember.disabled = true;
+    submitBtn.disabled = true;
+    showError(configurationError);
+  }
 
   const stale = staleData && loadLibrary ? h('div', { class: 'login-stale' },
     icon('info', 16),

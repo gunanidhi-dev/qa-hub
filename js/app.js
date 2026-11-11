@@ -451,6 +451,14 @@ async function boot() {
   } catch (e) { console.error(e); }
 
   credentials = await loadCredentials();
+  if (!credentials) {
+    clearSession();
+    renderLogin(appEl, {
+      store,
+      configurationError: 'Sign-in is unavailable because the account configuration could not be loaded. Contact the administrator. GitHub Pages does not include the local credentials file or run the Node access restrictions.',
+    });
+    return;
+  }
   if (credentials) {
     const session = readSession();
     const valid = session && store.get('members', session.memberId)?.active !== false

@@ -36,7 +36,7 @@ node scripts/create-users.js path/to/users.txt
 
 To add or replace a few users without touching the others, use `node scripts/create-users.js --add new-users.txt`.
 
-Usernames must match team members in the library (`dossmk`, `gunanidhi`, `selshiya`, `sujitha`, `santhiya`, `marivijayakumar`, `samnikesh`, `vignesh`). Re-running the script replaces the file. If `data/users.local.json` is missing, QA Hub falls back to the old local profile picker.
+Usernames must match team members in the library (`dossmk`, `gunanidhi`, `selshiya`, `sujitha`, `santhiya`, `marivijayakumar`, `samnikesh`, `vignesh`). Re-running the script replaces the file. If `data/users.local.json` is missing or cannot be loaded, QA Hub stays on a disabled sign-in screen with a configuration error; it does not fall back to the profile picker.
 
 Sessions last until the tab closes, or 12 hours with "Keep me signed in". After 5 wrong passwords the form waits 15 s, then longer. Sign out from the account button in the top bar.
 
@@ -159,7 +159,7 @@ If two people edit the same case at the same time, the import preview marks it a
 
 ## Known limitations (by design)
 
-- **Identity is checked only in the browser.** The sign-in compares a PBKDF2 hash in the page; it is not authentication. Without `data/users.local.json`, profiles are plain local labels shown as "not authenticated".
+- **Identity is checked only in the browser.** The sign-in compares a PBKDF2 hash in the page; it is not secure server-side authentication. Without `data/users.local.json`, sign-in is disabled. This UI gate does not protect files published by a static host.
 - **Roles (Admin, Maintainer, Contributor, Viewer) are UI conveniences, not access control.** Anyone with the static files, DevTools or the JSON can bypass them.
 - **This is an activity log, not a compliance-grade audit trail.** Actor IDs and timestamps come from the browser and can be edited. Git history adds reviewable provenance but does not authenticate in-app actors. Regulated auditability would need a backend with real authentication and append-only server-side logging.
 - **There is no real-time collaboration.** Your edits are visible to others only after an export, a commit and their import. Concurrent edits are detected on import, not prevented.
