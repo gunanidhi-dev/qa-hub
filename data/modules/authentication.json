@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "id": "qa-hub",
+    "name": "Healthcare QA Hub"
+  },
+  "scope": {
+    "type": "module",
+    "moduleId": "mod-authentication"
+  },
+  "members": [
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-a",
+      "memberId": "dev-a",
+      "displayName": "Developer A",
+      "role": "Admin",
+      "active": true,
+      "placeholder": true
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-b",
+      "memberId": "dev-b",
+      "displayName": "Developer B",
+      "role": "Maintainer",
+      "active": true,
+      "placeholder": true
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-c",
+      "memberId": "dev-c",
+      "displayName": "Developer C",
+      "role": "Maintainer",
+      "active": true,
+      "placeholder": true
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-d",
+      "memberId": "dev-d",
+      "displayName": "Developer D",
+      "role": "Contributor",
+      "active": true,
+      "placeholder": true
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-e",
+      "memberId": "dev-e",
+      "displayName": "Developer E",
+      "role": "Contributor",
+      "active": true,
+      "placeholder": true
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-f",
+      "memberId": "dev-f",
+      "displayName": "Developer F",
+      "role": "Contributor",
+      "active": true,
+      "placeholder": true
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-g",
+      "memberId": "dev-g",
+      "displayName": "Developer G",
+      "role": "Contributor",
+      "active": true,
+      "placeholder": true
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mbr-dev-h",
+      "memberId": "dev-h",
+      "displayName": "Developer H",
+      "role": "Viewer",
+      "active": true,
+      "placeholder": true
+    }
+  ],
+  "accounts": [
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "acct-account-a",
+      "name": "Example Account A",
+      "description": "Editable example account label."
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "acct-account-b",
+      "name": "Example Account B",
+      "description": "Editable example account label."
+    }
+  ],
+  "testSuites": [
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "suite-smoke",
+      "name": "Smoke",
+      "description": "Fast checks that the build is usable."
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "suite-sanity",
+      "name": "Sanity",
+      "description": "Focused checks after a small change."
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "suite-regression",
+      "name": "Regression",
+      "description": "Broad checks before release."
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "suite-release-critical",
+      "name": "Release Critical",
+      "description": "Must pass before any production release."
+    }
+  ],
+  "modules": [
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "mod-authentication",
+      "name": "Authentication",
+      "keyPrefix": "AUTH",
+      "description": "Login, logout, password reset, session handling.",
+      "ownerId": "mbr-dev-b",
+      "targetCases": null,
+      "archived": false,
+      "order": 0
+    }
+  ],
+  "features": [
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "feat-authentication-login",
+      "moduleId": "mod-authentication",
+      "name": "Login",
+      "description": "",
+      "ownerId": "",
+      "archived": false,
+      "order": 0
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "feat-authentication-password-reset",
+      "moduleId": "mod-authentication",
+      "name": "Password Reset",
+      "description": "",
+      "ownerId": "",
+      "archived": false,
+      "order": 1
+    },
+    {
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "sample": true,
+      "id": "feat-authentication-session-timeout",
+      "moduleId": "mod-authentication",
+      "name": "Session Timeout",
+      "description": "",
+      "ownerId": "",
+      "archived": false,
+      "order": 2
+    }
+  ],
+  "testCases": [
+    {
+      "id": "case-demo-auth-001",
+      "caseKey": "AUTH-001",
+      "title": "[Demo] Valid user can log in",
+      "moduleId": "mod-authentication",
+      "featureId": "feat-authentication-login",
+      "objective": "A registered user with valid credentials reaches the home dashboard after signing in.",
+      "description": "Demonstration case — replace or delete once real coverage is documented.",
+      "preconditions": "A synthetic test user exists in the QA environment. Use credentials from the team secret store; never write them here.",
+      "steps": [
+        {
+          "action": "Open the login page.",
+          "expected": "Login form shows username and password fields."
+        },
+        {
+          "action": "Enter the synthetic test user's username and password.",
+          "expected": "Fields accept input; password is masked."
+        },
+        {
+          "action": "Select \"Sign in\".",
+          "expected": "User is redirected to the home dashboard and their display name is shown."
+        }
+      ],
+      "expectedResult": "User is authenticated and lands on the dashboard without errors.",
+      "priority": "Critical",
+      "status": "Approved",
+      "testLevel": "E2E",
+      "suites": [
+        "suite-smoke",
+        "suite-regression"
+      ],
+      "automationStatus": "Planned",
+      "automationPath": "",
+      "tags": [
+        "demo",
+        "login"
+      ],
+      "accountIds": [],
+      "assignedTo": "mbr-dev-d",
+      "requirementRef": "",
+      "bugRefs": [],
+      "risk": "",
+      "testDataNotes": "Synthetic user only.",
+      "reviewedBy": "mbr-dev-b",
+      "reviewedAt": "2026-01-01T00:00:00.000Z",
+      "reviewNote": "",
+      "version": 1,
+      "createdBy": "mbr-dev-a",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedBy": "mbr-dev-a",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "deletedAt": null,
+      "deletedBy": null,
+      "deletionReason": "",
+      "sample": true,
+      "demo": true
+    }
+  ],
+  "testRuns": [],
+  "activity": [
+    {
+      "eventId": "evt-seed-case-demo-auth-001",
+      "entityType": "testCase",
+      "entityId": "case-demo-auth-001",
+      "entityLabel": "AUTH-001",
+      "moduleId": "mod-authentication",
+      "action": "create",
+      "actorId": "mbr-dev-a",
+      "timestamp": "2026-01-01T00:00:00.000Z",
+      "changedFields": [],
+      "note": "Demonstration case seeded on first launch."
+    }
+  ],
+  "deletedItems": [],
+  "exportedAt": "2026-01-01T00:00:00.000Z"
+}
