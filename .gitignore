@@ -1,13 +1,1 @@
 node_modules/
-*.log
-.DS_Store
-Thumbs.db
-.env
-.env.*
-# Local browser exports/backups — commit only reviewed files under data/
-qa-hub-*.json
-qa-hub-*.csv
-shots/
-# Local sign-in hashes — never commit (create with scripts/create-users.js)
-data/users.local.json
-users.txt
